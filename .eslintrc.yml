@@ -1,0 +1,6 @@
+extends: airbnb
+parser: babel-eslint
+globals:
+  expect: false
+  jest: false
+  test: false

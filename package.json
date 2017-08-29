@@ -1,0 +1,32 @@
+{
+  "name": "promise-more",
+  "version": "1.0.0",
+  "description": "A well-tested library for handling Promises with Flow type declarations and carefully thought out API",
+  "repository": "mhagmajer/promise-more",
+  "bugs": "https://github.com/mhagmajer/promise-more/issues",
+  "license": "MIT",
+  "author": "Marcin Hagmajer",
+  "main": "lib/index.js",
+  "scripts": {
+    "flow": "flow",
+    "lint": "eslint .",
+    "docs": "documentation readme src/** --section=API",
+    "test": "gulp && jest"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "del": "^3.0.0",
+    "eslint": "^4.5.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.3.0",
+    "flow-bin": "^0.53.1",
+    "flow-remove-types": "^1.2.1",
+    "gulp": "^3.9.1",
+    "gulp-mirror": "^1.0.0",
+    "gulp-rename": "^1.2.2",
+    "jest": "^20.0.4",
+    "through2": "^2.0.3"
+  }
+}
