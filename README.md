@@ -46,7 +46,6 @@ Waits for given time and then resolves with the value specified.
 **Parameters**
 
 -   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait.
--   `value` **T** The value to resolve with.
 
 **Examples**
 
@@ -54,4 +53,4 @@ Waits for given time and then resolves with the value specified.
 await delay(1000); // wait one second
 ```
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>**
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
