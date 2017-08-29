@@ -1,6 +1,6 @@
 {
   "name": "promise-more",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A well-tested library for handling Promises with Flow type declarations and carefully thought out API",
   "repository": "mhagmajer/promise-more",
   "bugs": "https://github.com/mhagmajer/promise-more/issues",
@@ -25,7 +25,7 @@
   "scripts": {
     "flow": "flow",
     "lint": "eslint .",
-    "docs": "documentation readme src/** --section=API --config documentation.yml",
+    "docs": "documentation readme src/** --section=API --config documentation.yml --markdown-toc=true",
     "test": "gulp && jest",
     "prepublishOnly": "npm run flow && npm run lint && npm test"
   },
