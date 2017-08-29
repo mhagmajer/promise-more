@@ -13,7 +13,7 @@ Contributions welcome!
 ## Usage example
 
 ```javascript
-const promiseMore from 'promise-more';
+const promiseMore = require('promise-more');
 
 async function main() {
   console.log('Hello...');
