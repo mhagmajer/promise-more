@@ -10,7 +10,16 @@ Contributions welcome!
 
 `npm install --save promise-more`
 
-## Usage example
+## Usage example (without async/await)
+
+```javascript
+console.log('Hello...');
+promiseMore.delay(500).then(() => { // wait half a second
+  console.log('...world!');
+});
+```
+
+## Usage example (with async/await - recommended)
 
 ```javascript
 const promiseMore = require('promise-more');
@@ -20,6 +29,8 @@ async function main() {
   await promiseMore.delay(500); // wait half a second
   console.log('...world!');  
 }
+
+main();
 ```
 
 # API
