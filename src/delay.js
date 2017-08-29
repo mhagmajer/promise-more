@@ -1,7 +1,7 @@
 /* @flow */
 
 /**
- * Waits for given time and then resolves with the value specified.
+ * Waits for given time and then resolves with {@link undefined}.
  * @param ms The number of milliseconds to wait.
  * @example
  * await delay(1000); // wait one second

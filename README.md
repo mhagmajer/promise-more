@@ -41,7 +41,7 @@ main();
 
 ## delay
 
-Waits for given time and then resolves with the value specified.
+Waits for given time and then resolves with [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined).
 
 **Parameters**
 
