@@ -1,11 +1,23 @@
 {
   "name": "promise-more",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A well-tested library for handling Promises with Flow type declarations and carefully thought out API",
   "repository": "mhagmajer/promise-more",
   "bugs": "https://github.com/mhagmajer/promise-more/issues",
   "license": "MIT",
   "author": "Marcin Hagmajer",
+  "keywords": [
+    "async",
+    "await",
+    "bluebird",
+    "callback",
+    "library",
+    "module",
+    "promise",
+    "q",
+    "tools",
+    "utility"
+  ],
   "main": "lib/index.js",
   "scripts": {
     "flow": "flow",
