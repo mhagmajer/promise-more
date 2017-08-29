@@ -1,5 +1,7 @@
 extends: airbnb
 parser: babel-eslint
+rules:
+  comma-dangle: 0
 globals:
   expect: false
   jest: false

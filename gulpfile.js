@@ -1,5 +1,3 @@
-/* eslint-disable comma-dangle */
-
 const del = require('del');
 const flowRemoveTypes = require('flow-remove-types');
 const gulp = require('gulp');
