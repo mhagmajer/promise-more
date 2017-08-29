@@ -13,6 +13,8 @@ Contributions welcome!
 ## Usage example (without async/await)
 
 ```javascript
+const promiseMore = require('promise-more');
+
 console.log('Hello...');
 promiseMore.delay(500).then(() => { // wait half a second
   console.log('...world!');
