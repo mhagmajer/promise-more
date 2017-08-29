@@ -2,7 +2,7 @@
 
 /**
  * Runs tasks sequentially. The next one is run only after previous was resolved.
- * Reject immediately if any task rejects.
+ * Rejects immediately if any task rejects.
  * @param tasks Tasks to run
  * @example
  * // prints "Hello world" one letter at a time
