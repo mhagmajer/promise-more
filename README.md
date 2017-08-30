@@ -15,11 +15,11 @@ Contributions welcome!
 ### With async/await - recommended
 
 ```javascript
-const promiseMore = require('promise-more');
+const { delay } = require('promise-more');
 
 async function main() {
   console.log('Hello...');
-  await promiseMore.delay(500); // wait half a second
+  await delay(500); // wait half a second
   console.log('...world!');  
 }
 
@@ -29,10 +29,10 @@ main();
 ### Without async/await
 
 ```javascript
-const promiseMore = require('promise-more');
+const { delay } = require('promise-more');
 
 console.log('Hello...');
-promiseMore.delay(500).then(() => { // wait half a second
+delay(500).then(() => { // wait half a second
   console.log('...world!');
 });
 ```
@@ -47,6 +47,10 @@ promiseMore.delay(500).then(() => { // wait half a second
 -   [sequence](#sequence)
 -   [Utils](#utils)
 -   [delay](#delay)
+-   [timeout](#timeout)
+-   [Errors](#errors)
+-   [TimeoutError](#timeouterror)
+-   [BaseError](#baseerror)
 
 ## Control Flow
 
@@ -102,3 +106,34 @@ async function main() {
 ```
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
+
+## timeout
+
+Rejects with instance of [TimeoutError](#timeouterror) if promise doesn't resolve within the specified
+time.
+
+**Parameters**
+
+-   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise to put time constraint on
+-   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
+
+## Errors
+
+Possible errors.
+
+
+## TimeoutError
+
+**Extends BaseError**
+
+Timeout
+
+## BaseError
+
+**Extends Error**
+
+**Parameters**
+
+-   `message` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 

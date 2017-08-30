@@ -5,3 +5,7 @@ toc:
   - name: Utils
     description: Other utility functions.
   - delay
+  - timeout
+  - name: Errors
+    description: Possible errors.
+  - TimeoutError
