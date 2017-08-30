@@ -80,7 +80,7 @@ async function delayedLog(s) {
 }
 ```
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>**
 
 ## Utils
 
@@ -105,19 +105,26 @@ async function main() {
 }
 ```
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>**
 
 ## timeout
 
 Rejects with instance of [TimeoutError](#timeouterror) if promise doesn't resolve within the specified
-time.
+time. Resolves with the value of promise otherwise.
 
 **Parameters**
 
 -   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise to put time constraint on
 -   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
+**Examples**
+
+```javascript
+// rejects if npmjs.com isn't fetched within 100 ms
+timeout(fetch('https://www.npmjs.com/'), 100);
+```
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>**
 
 ## Errors
 
@@ -136,4 +143,4 @@ Timeout
 
 **Parameters**
 
--   `message` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `message` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
