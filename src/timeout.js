@@ -15,9 +15,9 @@ const delay = require('./delay');
 function timeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([
     promise,
-    delay(ms).then(() => Promise.reject(
-      new TimeoutError(`Promise didin't resolve within expected time of ${ms} ms`)
-    ))
+    delay(ms).then(() => Promise.reject(new TimeoutError(
+      `Timeout: Promise didn't resolve within the expected time of ${ms} milliseconds`
+    )))
   ]);
 }
 
