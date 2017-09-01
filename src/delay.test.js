@@ -2,7 +2,7 @@
 
 const delay = require('./delay');
 
-test('is compatible with setTimeout', () => {
+test('it is compatible with setTimeout', () => {
   expect.assertions(2);
 
   const cb = jest.fn();

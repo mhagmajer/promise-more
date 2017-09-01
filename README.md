@@ -43,19 +43,64 @@ delay(500).then(() => { // wait half a second
 
 ### Table of Contents
 
--   [Control Flow](#control-flow)
+-   [CONTROL FLOW](#control-flow)
+-   [Task](#task)
+-   [scheduler](#scheduler)
 -   [sequence](#sequence)
--   [Utils](#utils)
+-   [UTILITIES](#utilities)
 -   [delay](#delay)
 -   [timeout](#timeout)
--   [Errors](#errors)
+-   [ERRORS](#errors)
 -   [TimeoutError](#timeouterror)
 -   [BaseError](#baseerror)
 
-## Control Flow
+## CONTROL FLOW
 
 Functions to control how asynchronous tasks are executed.
 
+
+## Task
+
+Task is a function that returns a Promise of value (asynchronous execution) or the value itself
+(synchronous execution).
+
+This type definition is used by all the control flow functions.
+
+Type: function (): ([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T> | T)
+
+**Examples**
+
+```javascript
+// once run, it waits 1s and then logs 'Hello!'
+const task: Task<void> = () => delay(1000).then(() => console.log('Hello!'));
+```
+
+## scheduler
+
+Scheduler enqueues tasks to be run in accordance with options passed.
+
+Scheduler options (all optional):
+
+-   `limit` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The limit of tasks that can be run simultaneously (default `1`)
+
+Task execution options (all optional):
+
+-   `immediate` [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) Whether the task should be run immediately disregarding the queue
+    (default `false`)
+
+**Parameters**
+
+-   `options` **SchedulerOptions** 
+
+**Examples**
+
+```javascript
+const schedule = scheduler();
+schedule(() => delay(1000).then(() => console.log('A second has passed')));
+schedule(() => delay(2000).then(() => console.log('Two more seconds have passed')));
+```
+
+Returns **function (task: [Task](#task)&lt;T>, options: TaskOptions): [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
 
 ## sequence
 
@@ -64,7 +109,7 @@ Rejects immediately if any task rejects.
 
 **Parameters**
 
--   `tasks` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;function (): ([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void> | void)>** Tasks to run
+-   `tasks` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Task](#task)&lt;void>>** Tasks to run
 
 **Examples**
 
@@ -82,7 +127,7 @@ async function delayedLog(s) {
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
 
-## Utils
+## UTILITIES
 
 Other utility functions.
 
@@ -126,7 +171,7 @@ timeout(fetch('https://www.npmjs.com/'), 100);
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
 
-## Errors
+## ERRORS
 
 Possible errors.
 

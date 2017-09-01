@@ -1,11 +1,13 @@
 toc:
-  - name: Control Flow
+  - name: CONTROL FLOW
     description: Functions to control how asynchronous tasks are executed.
+  - Task
+  - scheduler
   - sequence
-  - name: Utils
+  - name: UTILITIES
     description: Other utility functions.
   - delay
   - timeout
-  - name: Errors
+  - name: ERRORS
     description: Possible errors.
   - TimeoutError

@@ -1,5 +1,7 @@
 /* @flow */
 
+import type { Task } from './types';
+
 /**
  * Runs tasks sequentially. The next one is run only after previous was resolved.
  * Rejects immediately if any task rejects.
@@ -15,7 +17,7 @@
  *   console.log(s);
  * }
  */
-function sequence(tasks: Array<() => Promise<void> | void>): Promise<void> {
+function sequence(tasks: Array<Task<void>>): Promise<void> {
   return tasks.reduce((a, task) => a.then(task), Promise.resolve());
 }
 
