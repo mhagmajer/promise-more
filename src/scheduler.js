@@ -24,9 +24,23 @@ type TaskOptions = {|
  * - `immediate` {@link boolean} Whether the task should be run immediately disregarding the queue
  * (default `false`)
  * @example
+ * // runs two tasks sequentially
  * const schedule = scheduler();
- * schedule(() => delay(1000).then(() => console.log('A second has passed')));
- * schedule(() => delay(2000).then(() => console.log('Two more seconds have passed')));
+ * schedule(async () => {
+ *   delay(1000);
+ *   console.log('A second has passed');
+ * });
+ *
+ * schedule(async () => {
+ *   delay(2000);
+ *   console.log('Two more seconds have passed');
+ * });
+ * @example
+ * // runs tasks in parallel with the limit provided
+ * function parallelLimit(tasks, limit) {
+ *   const schedule = scheduler({ limit });
+ *   return Promise.all(tasks.map(t => schedule(t)));
+ * }
  */
 function scheduler(
   options?: SchedulerOptions

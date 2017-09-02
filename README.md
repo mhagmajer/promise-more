@@ -61,8 +61,8 @@ Functions to control how asynchronous tasks are executed.
 
 ## Task
 
-Task is a function that returns a Promise of value (asynchronous execution) or the value itself
-(synchronous execution).
+Task is a function that returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) of value (asynchronous execution) or the value
+itself (synchronous execution).
 
 This type definition is used by all the control flow functions.
 
@@ -72,7 +72,10 @@ Type: function (): ([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaS
 
 ```javascript
 // once run, it waits 1s and then logs 'Hello!'
-const task: Task<void> = () => delay(1000).then(() => console.log('Hello!'));
+const task: Task<void> = async () => {
+  await delay(1000);
+  console.log('Hello!'));
+};
 ```
 
 ## scheduler
@@ -95,9 +98,25 @@ Task execution options (all optional):
 **Examples**
 
 ```javascript
+// runs two tasks sequentially
 const schedule = scheduler();
-schedule(() => delay(1000).then(() => console.log('A second has passed')));
-schedule(() => delay(2000).then(() => console.log('Two more seconds have passed')));
+schedule(async () => {
+  delay(1000);
+  console.log('A second has passed');
+});
+
+schedule(async () => {
+  delay(2000);
+  console.log('Two more seconds have passed');
+});
+```
+
+```javascript
+// runs tasks in parallel with the limit provided
+function parallelLimit(tasks, limit) {
+  const schedule = scheduler({ limit });
+  return Promise.all(tasks.map(t => schedule(t)));
+}
 ```
 
 Returns **function (task: [Task](#task)&lt;T>, options: TaskOptions): [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
