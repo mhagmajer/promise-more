@@ -90,6 +90,7 @@ Task execution options (all optional):
 
 -   `immediate` [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) Whether the task should be run immediately disregarding the queue
     (default `false`)
+-   `priority` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Priority (the higher the value, the sooner task is run) (default `0`)
 
 **Parameters**
 
@@ -98,15 +99,15 @@ Task execution options (all optional):
 **Examples**
 
 ```javascript
-// runs two tasks sequentially
+// runs two given tasks sequentially
 const schedule = scheduler();
 schedule(async () => {
-  delay(1000);
+  await delay(1000);
   console.log('A second has passed');
 });
 
 schedule(async () => {
-  delay(2000);
+  await delay(2000);
   console.log('Two more seconds have passed');
 });
 ```
@@ -115,6 +116,14 @@ schedule(async () => {
 // runs tasks in parallel with the limit provided
 function parallelLimit(tasks, limit) {
   const schedule = scheduler({ limit });
+  return Promise.all(tasks.map(t => schedule(t)));
+}
+```
+
+```javascript
+// runs tasks sequentially and resolves to an array of results
+function series(tasks) {
+  const schedule = scheduler();
   return Promise.all(tasks.map(t => schedule(t)));
 }
 ```

@@ -1,5 +1,7 @@
 /* @flow */
 
+import type { Task } from './types';
+
 const delay = require('./delay');
 const scheduler = require('./scheduler');
 
@@ -60,4 +62,27 @@ test('it can run a task immediately', () => {
 
   const value = {};
   return expect(schedule(() => value, { immediate: true })).resolves.toBe(value);
+});
+
+test('it runs tasks sequentially with respect to priority', () => {
+  expect.assertions(1);
+
+  const schedule = scheduler();
+  const cb = jest.fn();
+
+  type TaskWithPriority<T> = {
+    task: Task<T>,
+    priority?: number;
+  };
+
+  const items: Array<TaskWithPriority<any>> = [{
+    task: () => delay(10).then(cb)
+  }, {
+    task: () => expect(cb).toHaveBeenCalledTimes(2),
+  }, {
+    task: () => delay(10).then(cb),
+    priority: 1,
+  }];
+
+  return Promise.all(items.map(item => schedule(item.task, { priority: item.priority || 0 })));
 });

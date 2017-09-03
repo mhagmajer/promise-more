@@ -4,14 +4,15 @@
 import type { Task } from './types';
 
 const invariant = require('./invariant');
-const Queue = require('./queue');
+const PriorityQueue = require('./priority-queue');
 
 type SchedulerOptions = {|
-  limit: number,
+  limit?: number,
 |};
 
 type TaskOptions = {|
-  immediate: boolean,
+  immediate?: boolean,
+  priority?: number,
 |};
 
 /**
@@ -23,16 +24,17 @@ type TaskOptions = {|
  * Task execution options (all optional):
  * - `immediate` {@link boolean} Whether the task should be run immediately disregarding the queue
  * (default `false`)
+ * - `priority` {@link number} Priority (the higher the value, the sooner task is run) (default `0`)
  * @example
- * // runs two tasks sequentially
+ * // runs two given tasks sequentially
  * const schedule = scheduler();
  * schedule(async () => {
- *   delay(1000);
+ *   await delay(1000);
  *   console.log('A second has passed');
  * });
  *
  * schedule(async () => {
- *   delay(2000);
+ *   await delay(2000);
  *   console.log('Two more seconds have passed');
  * });
  * @example
@@ -41,21 +43,28 @@ type TaskOptions = {|
  *   const schedule = scheduler({ limit });
  *   return Promise.all(tasks.map(t => schedule(t)));
  * }
+ * @example
+ * // runs tasks sequentially and resolves to an array of results
+ * function series(tasks) {
+ *   const schedule = scheduler();
+ *   return Promise.all(tasks.map(t => schedule(t)));
+ * }
  */
 function scheduler(
   options?: SchedulerOptions
 ): <T>(task: Task<T>, options?: TaskOptions) => Promise<T> {
-  const { limit } = (Object.assign({
-    limit: 1,
-  }, options): SchedulerOptions);
+  const limit = options && options.limit ? options.limit : 1;
 
   type QueueElem<T> = {|
     task: Task<T>,
     resolve: (result: Promise<T> | T) => void,
     reject: (error: any) => void,
+    priority: number,
   |};
 
-  const queue: Queue<QueueElem<any>> = new Queue();
+  const queue: PriorityQueue<QueueElem<any>> = new PriorityQueue({
+    comparePriority: (a, b) => a.priority - b.priority,
+  });
 
   let running = 0;
   const runNextTask = () => {
@@ -73,15 +82,16 @@ function scheduler(
   };
 
   return function taskRunner<T>(task: Task<T>, taskOptions?): Promise<T> {
-    const { immediate } = (Object.assign({
-      immediate: false,
-    }, taskOptions): TaskOptions);
+    const immediate = taskOptions && taskOptions.immediate ? taskOptions.immediate : false;
+    const priority = taskOptions && taskOptions.priority ? taskOptions.priority : 0;
 
     if (immediate) {
       return Promise.resolve(task());
     }
 
-    const promise = new Promise((resolve, reject) => queue.push({ task, resolve, reject }));
+    const promise = new Promise((resolve, reject) => {
+      queue.push({ task, resolve, reject, priority });
+    });
     runNextTask();
     return promise;
   };
