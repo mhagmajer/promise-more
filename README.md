@@ -91,6 +91,7 @@ Task execution options (all optional):
 -   `immediate` [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) Whether the task should be run immediately disregarding the queue
     (default `false`)
 -   `priority` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Priority (the higher the value, the sooner task is run) (default `0`)
+-   `context` any data you want make available to the task at the time of execution
 
 Tasks are passed a single object argument with the following properties:
 
@@ -105,7 +106,7 @@ Tasks are passed a single object argument with the following properties:
 
 **Parameters**
 
--   `schedulerOptionsInput` **$Shape&lt;SchedulerOptions>** 
+-   `schedulerOptions` **$Shape&lt;SchedulerOptions>** 
 
 **Examples**
 
@@ -139,7 +140,7 @@ function series(tasks) {
 }
 ```
 
-Returns **function (task: [Task](#task)&lt;T, RunParameters>, options: $Shape&lt;TaskOptions>): [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
+Returns **function (task: [Task](#task)&lt;T, RunParameters&lt;C>>, options: $Shape&lt;TaskOptions&lt;C>>): [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
 
 ## sequence
 

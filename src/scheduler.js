@@ -1,5 +1,5 @@
 /* @flow */
-/* globals T: false */
+/* globals T: false, C: false */
 
 import type { Task } from './types';
 
@@ -10,18 +10,26 @@ type SchedulerOptions = {|
   limit: number,
 |};
 
-type TaskOptions = {|
+type TaskOptions<C> = {|
   immediate: boolean,
   priority: number,
+  context: C,
 |};
 
-type RunParameters = {
+export type RunParameters<C> = {
   index: number,
   pending: number,
   waiting: number,
-  options: TaskOptions,
+  options: TaskOptions<C>,
   schedulerOptions: SchedulerOptions,
 };
+
+type QueueElem<T, C> = {|
+  task: Task<T, RunParameters<C>>,
+  resolve: (result: Promise<T> | T) => void,
+  reject: (error: any) => void,
+  options: TaskOptions<C>,
+|};
 
 /**
  * Scheduler enqueues tasks to be run in accordance with options passed.
@@ -33,6 +41,7 @@ type RunParameters = {
  * - `immediate` {@link boolean} Whether the task should be run immediately disregarding the queue
  * (default `false`)
  * - `priority` {@link number} Priority (the higher the value, the sooner task is run) (default `0`)
+ * - `context` any data you want make available to the task at the time of execution
  *
  * Tasks are passed a single object argument with the following properties:
  * - `index` {@link number} Number of task in queue (`-1` for immediate tasks). If running tasks
@@ -69,69 +78,65 @@ type RunParameters = {
  * }
  */
 function scheduler(
-  schedulerOptionsInput?: $Shape<SchedulerOptions>
-): <T>(task: Task<T, RunParameters>, options?: $Shape<TaskOptions>) => Promise<T> {
+  schedulerOptions?: $Shape<SchedulerOptions>
+): <T, C>(task: Task<T, RunParameters<C>>, options?: $Shape<TaskOptions<C>>) => Promise<T> {
   const {
     limit = 1,
-  } = schedulerOptionsInput || {};
-  const schedulerOptions = { limit };
+  } = schedulerOptions || {};
+  const schedulerOptionsWithDefaults = { limit };
 
-  type QueueElem<T> = {|
-    task: Task<T, RunParameters>,
-    resolve: (result: Promise<T> | T) => void,
-    reject: (error: any) => void,
-    options: TaskOptions,
-  |};
-
-  const queue: PriorityQueue<QueueElem<any>> = new PriorityQueue({
+  const queue: PriorityQueue<QueueElem<any, any>> = new PriorityQueue({
     comparePriority: (a, b) => a.options.priority - b.options.priority,
   });
 
   let index = 0;
   let pending = 0;
-  const runNextTask = () => {
+
+  function runTask<T, C>(task: Task<T, RunParameters<C>>, options: TaskOptions<C>): Promise<T> {
+    return Promise.resolve(task({
+      index: options.immediate ? -1 : index,
+      pending,
+      waiting: queue.size(),
+      options,
+      schedulerOptions: schedulerOptionsWithDefaults,
+    }));
+  }
+
+  function runNextTask() {
     if (queue.isEmpty() || pending >= limit) {
       return;
     }
 
-    pending += 1;
-    index += 1;
     const next = queue.pop();
-    invariant(next != null, 'checked is not empty');
-    Promise.resolve(next.task({
-      index,
-      pending,
-      waiting: queue.size(),
-      options: next.options,
-      schedulerOptions,
-    })).then(next.resolve, next.reject).then(() => {
+    invariant(next != null, 'queue is not empty');
+
+    index += 1;
+    pending += 1;
+    runTask(next.task, next.options).then(next.resolve, next.reject).then(() => {
       pending -= 1;
       runNextTask();
     });
-  };
+  }
 
-  return function taskRunner<T>(task: Task<T, RunParameters>, optionsInput?): Promise<T> {
+  return function taskRunner<T, C>(
+    task: Task<T, RunParameters<C>>,
+    options?: $Shape<TaskOptions<C>>
+  ): Promise<T> {
     const {
       immediate = false,
       priority = 0,
-    } = optionsInput || {};
-    const options = { immediate, priority };
+      context,
+    } = options || {};
+    const optionsWithDefaults = { immediate, priority, context };
 
     if (immediate) {
-      return Promise.resolve(task({
-        index: -1,
-        pending,
-        waiting: queue.size(),
-        options,
-        schedulerOptions,
-      }));
+      return runTask(task, optionsWithDefaults);
     }
 
-    const promise = new Promise((resolve, reject) => {
-      queue.push({ task, resolve, reject, options });
+    return new Promise((resolve, reject) => {
+      queue.push({ task, resolve, reject, options: optionsWithDefaults });
+      runNextTask();
     });
-    runNextTask();
-    return promise;
   };
 }
 

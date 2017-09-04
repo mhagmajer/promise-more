@@ -1,6 +1,6 @@
 {
   "name": "promise-more",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "A well-tested library for handling Promises with Flow type declarations and carefully thought out API",
   "repository": "mhagmajer/promise-more",
   "bugs": "https://github.com/mhagmajer/promise-more/issues",

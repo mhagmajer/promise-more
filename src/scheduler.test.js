@@ -121,8 +121,10 @@ test('it runs tasks with arguments', () => {
     },
   });
 
+  const context = {};
+
   return expect(
-    schedule(task, { priority: 1 }).then(() => task)
+    schedule(task, { priority: 1, context }).then(() => task)
   ).resolves.toHaveBeenLastCalledWith({
     index: 2,
     pending: 1,
@@ -130,6 +132,7 @@ test('it runs tasks with arguments', () => {
     options: {
       immediate: false,
       priority: 1,
+      context,
     },
     schedulerOptions: {
       limit: 1,
