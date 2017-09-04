@@ -66,7 +66,7 @@ itself (synchronous execution).
 
 This type definition is used by all the control flow functions.
 
-Type: function (): ([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T> | T)
+Type: function (args: P): ([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T> | T)
 
 **Examples**
 
@@ -92,9 +92,20 @@ Task execution options (all optional):
     (default `false`)
 -   `priority` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Priority (the higher the value, the sooner task is run) (default `0`)
 
+Tasks are passed a single object argument with the following properties:
+
+-   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of task in queue (`-1` for immediate tasks). If running tasks
+    in a process pool, you can use it to easily get the number of process:
+    `index % schedulerOptions.limit`.
+    Starts with `1`.
+-   `pending` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks currently running. Always positive.
+-   `waiting` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks still in the queue
+-   `options` Task options with default values
+-   `schedulerOptions` Scheduler options with default values
+
 **Parameters**
 
--   `options` **SchedulerOptions** 
+-   `schedulerOptionsInput` **$Shape&lt;SchedulerOptions>** 
 
 **Examples**
 
@@ -128,7 +139,7 @@ function series(tasks) {
 }
 ```
 
-Returns **function (task: [Task](#task)&lt;T>, options: TaskOptions): [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
+Returns **function (task: [Task](#task)&lt;T, RunParameters>, options: $Shape&lt;TaskOptions>): [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
 
 ## sequence
 
@@ -137,7 +148,7 @@ Rejects immediately if any task rejects.
 
 **Parameters**
 
--   `tasks` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Task](#task)&lt;void>>** Tasks to run
+-   `tasks` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Task](#task)&lt;void, void>>** Tasks to run
 
 **Examples**
 
