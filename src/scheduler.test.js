@@ -71,7 +71,7 @@ test('it runs tasks sequentially with respect to priority', () => {
   const cb = jest.fn();
 
   type TaskWithPriority<T> = {
-    task: Task<T>,
+    task: Task<T, *>,
     priority?: number;
   };
 
@@ -85,4 +85,54 @@ test('it runs tasks sequentially with respect to priority', () => {
   }];
 
   return Promise.all(items.map(item => schedule(item.task, { priority: item.priority || 0 })));
+});
+
+test('it runs tasks with arguments', () => {
+  expect.assertions(3);
+
+  const schedule = scheduler();
+  const task = jest.fn(() => delay(10));
+  schedule(task);
+  expect(task).toHaveBeenLastCalledWith({
+    index: 1,
+    pending: 1,
+    waiting: 0,
+    options: {
+      immediate: false,
+      priority: 0,
+    },
+    schedulerOptions: {
+      limit: 1,
+    },
+  });
+  schedule(() => delay(10));
+
+  schedule(task, { immediate: true });
+  expect(task).toHaveBeenLastCalledWith({
+    index: -1,
+    pending: 1,
+    waiting: 1,
+    options: {
+      immediate: true,
+      priority: 0,
+    },
+    schedulerOptions: {
+      limit: 1,
+    },
+  });
+
+  return expect(
+    schedule(task, { priority: 1 }).then(() => task)
+  ).resolves.toHaveBeenLastCalledWith({
+    index: 2,
+    pending: 1,
+    waiting: 1,
+    options: {
+      immediate: false,
+      priority: 1,
+    },
+    schedulerOptions: {
+      limit: 1,
+    },
+  });
 });

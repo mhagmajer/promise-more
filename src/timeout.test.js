@@ -10,7 +10,7 @@ test('it resolves before timeout', () => {
   const value = {};
   return expect(timeout(
     delay(5).then(() => value),
-    10
+    20
   )).resolves.toBe(value);
 });
 
@@ -19,7 +19,7 @@ test('it rejects after timeout', () => {
 
   const value = {};
   return expect(timeout(
-    delay(10).then(() => value),
+    delay(20).then(() => value),
     5
   )).rejects.toBeInstanceOf(TimeoutError);
 });

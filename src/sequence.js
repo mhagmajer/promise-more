@@ -17,7 +17,7 @@ import type { Task } from './types';
  *   console.log(s);
  * }
  */
-function sequence(tasks: Array<Task<void>>): Promise<void> {
+function sequence(tasks: Array<Task<void, void>>): Promise<void> {
   return tasks.reduce((a, task) => a.then(task), Promise.resolve());
 }
 

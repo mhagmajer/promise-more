@@ -13,4 +13,4 @@
  *   console.log('Hello!'));
  * };
  */
-export type Task<T> = () => Promise<T> | T;
+export type Task<T, P> = (args: P) => Promise<T> | T;

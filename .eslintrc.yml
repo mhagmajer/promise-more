@@ -6,6 +6,7 @@ rules:
     - error
     - allowAfterThis: true
 globals:
+  $Shape: false
   expect: false
   jest: false
   test: false
