@@ -8,7 +8,7 @@
  *
  * @example
  * // once run, it waits 1s and then logs 'Hello!'
- * const task: Task<void> = async () => {
+ * const task: Task<void, void> = async () => {
  *   await delay(1000);
  *   console.log('Hello!'));
  * };

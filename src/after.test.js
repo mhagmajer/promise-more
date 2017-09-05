@@ -12,7 +12,7 @@ test('it is run after fulfilled promise', () => {
   const afterPromise = after(promise, cleanup);
   expect(cleanup).not.toHaveBeenCalled();
   return promise
-    .then(() => expect(cleanup).toHaveBeenCalledWith(promise))
+    .then(() => expect(cleanup).toHaveBeenCalled())
     .then(() => expect(afterPromise).resolves.toBe(value));
 });
 
@@ -25,6 +25,16 @@ test('it is run after rejected promise', () => {
   const afterPromise = after(promise, cleanup);
   expect(cleanup).not.toHaveBeenCalled();
   return promise
-    .catch(() => expect(cleanup).toHaveBeenCalledWith(promise))
+    .catch(() => expect(cleanup).toHaveBeenCalled())
     .then(() => expect(afterPromise).rejects.toBe(reason));
+});
+
+test('it propagates error from the task callback', () => {
+  expect.assertions(2);
+
+  const reason = {};
+  return Promise.all([
+    expect(after(delay(10), () => Promise.reject(reason))).rejects.toBe(reason),
+    expect(after(delay(10), () => { throw reason; })).rejects.toBe(reason),
+  ]);
 });

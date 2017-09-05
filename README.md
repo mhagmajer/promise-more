@@ -73,7 +73,7 @@ Type: function (args: P): ([Promise](https://developer.mozilla.org/en-US/docs/We
 
 ```javascript
 // once run, it waits 1s and then logs 'Hello!'
-const task: Task<void> = async () => {
+const task: Task<void, void> = async () => {
   await delay(1000);
   console.log('Hello!'));
 };
@@ -181,8 +181,7 @@ Runs task after promise was resolved or rejected (like `finally`).
 **Parameters**
 
 -   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise after which to run the task
--   `task` **[Task](#task)&lt;void, [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>>** The task to run after the promise. Gets the fulfilled or rejected promise in the
-    first argument.
+-   `task` **[Task](#task)&lt;void, void>** The task to run after the promise. If the task throws, the error is propagated.
 
 **Examples**
 
