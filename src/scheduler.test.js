@@ -96,10 +96,10 @@ test('it runs tasks with arguments', () => {
   const task = jest.fn(() => delay(10));
   schedule(task);
   expect(task).toHaveBeenLastCalledWith({
-    index: 1,
+    index: 0,
     pending: 1,
     waiting: 0,
-    workerNr: 1,
+    workerNr: 0,
     options: {
       immediate: false,
       priority: 0,
@@ -116,10 +116,10 @@ test('it runs tasks with arguments', () => {
   const immediateTask = jest.fn();
   schedule(immediateTask, { immediate: true });
   expect(immediateTask).toHaveBeenLastCalledWith({
-    index: 2,
+    index: 1,
     pending: 2,
     waiting: 1,
-    workerNr: 0,
+    workerNr: -1,
     options: {
       immediate: true,
       priority: 0,
@@ -136,10 +136,10 @@ test('it runs tasks with arguments', () => {
   return expect(
     schedule(importantTask, { priority: 1, context }).then(() => importantTask)
   ).resolves.toHaveBeenLastCalledWith({
-    index: 3,
+    index: 2,
     pending: 1,
     waiting: 1,
-    workerNr: 1,
+    workerNr: 0,
     options: {
       immediate: false,
       priority: 1,
@@ -160,5 +160,5 @@ test('it assign correct worker numbers', () => {
 
   return expect(Promise.all(
     [10, 5, 5].map(ms => schedule(task(ms)))
-  )).resolves.toEqual([1, 2, 2]);
+  )).resolves.toEqual([0, 1, 1]);
 });

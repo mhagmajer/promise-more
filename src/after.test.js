@@ -1,27 +1,30 @@
 /* @flow */
 
 const after = require('./after');
+const delay = require('./delay');
 
 test('it is run after fulfilled promise', () => {
-  expect.assertions(2);
+  expect.assertions(3);
 
   const value = {};
   const cleanup = jest.fn();
-  const promise = after(Promise.resolve(value), cleanup);
-  return Promise.all([
-    promise.then(() => expect(cleanup).toHaveBeenCalled()),
-    expect(promise).resolves.toBe(value),
-  ]);
+  const promise = delay(10).then(() => value);
+  const afterPromise = after(promise, cleanup);
+  expect(cleanup).not.toHaveBeenCalled();
+  return promise
+    .then(() => expect(cleanup).toHaveBeenCalledWith(promise))
+    .then(() => expect(afterPromise).resolves.toBe(value));
 });
 
 test('it is run after rejected promise', () => {
-  expect.assertions(2);
+  expect.assertions(3);
 
   const reason = {};
   const cleanup = jest.fn();
-  const promise = after(Promise.reject(reason), cleanup);
-  return Promise.all([
-    promise.catch(() => expect(cleanup).toHaveBeenCalled()),
-    expect(promise).rejects.toBe(reason),
-  ]);
+  const promise = delay(10).then(() => Promise.reject(reason));
+  const afterPromise = after(promise, cleanup);
+  expect(cleanup).not.toHaveBeenCalled();
+  return promise
+    .catch(() => expect(cleanup).toHaveBeenCalledWith(promise))
+    .then(() => expect(afterPromise).rejects.toBe(reason));
 });

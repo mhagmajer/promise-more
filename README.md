@@ -97,12 +97,12 @@ Task execution options (all optional):
 
 Tasks are passed as a single object argument with the following properties:
 
--   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Order in which scheduled tasks are run. Starts with `1`.
+-   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The sequence number of the task being run. Starts with `0`.
 -   `pending` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks currently running (including immediate ones). Always
     positive.
 -   `waiting` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks still in the queue
--   `workerNr` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The number of worker (`1`..`limit`) who should get this task. For
-    immediate tasks it is `0` - they are usually run with some extra resources.
+-   `workerNr` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The number of worker (`0`..`(limit-1)`) who should get this task. For
+    immediate tasks it is equal to `-1` - they are usually handled by some extra resources.
 -   `options` Task options with default values
 -   `schedulerOptions` Scheduler options with default values
 
@@ -181,7 +181,8 @@ Runs task after promise was resolved or rejected (like `finally`).
 **Parameters**
 
 -   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise after which to run the task
--   `task` **[Task](#task)&lt;void, void>** The task to run after the promise
+-   `task` **[Task](#task)&lt;void, [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>>** The task to run after the promise. Gets the fulfilled or rejected promise in the
+    first argument.
 
 **Examples**
 

@@ -47,12 +47,12 @@ type QueueElem<T, C> = {|
  * `undefined`)
  *
  * Tasks are passed as a single object argument with the following properties:
- * - `index` {@link number} Order in which scheduled tasks are run. Starts with `1`.
+ * - `index` {@link number} The sequence number of the task being run. Starts with `0`.
  * - `pending` {@link number} Number of tasks currently running (including immediate ones). Always
  * positive.
  * - `waiting` {@link number} Number of tasks still in the queue
- * - `workerNr` {@link number} The number of worker (`1`..`limit`) who should get this task. For
- * immediate tasks it is `0` - they are usually run with some extra resources.
+ * - `workerNr` {@link number} The number of worker (`0`..`(limit-1)`) who should get this task. For
+ * immediate tasks it is equal to `-1` - they are usually handled by some extra resources.
  * - `options` Task options with default values
  * - `schedulerOptions` Scheduler options with default values
  * @example
@@ -92,7 +92,7 @@ function scheduler(
     comparePriority: (a, b) => a.options.priority - b.options.priority,
   });
 
-  let index = 0;
+  let index = -1;
   let pending = 0;
   let pendingImmediate = 0;
 
@@ -105,11 +105,11 @@ function scheduler(
 
     if (immediate) {
       pendingImmediate += 1;
-      workerNr = 0;
+      workerNr = -1;
     } else {
       pending += 1;
-      workerNr = workers.indexOf(false) + 1;
-      workers[workerNr - 1] = true;
+      workerNr = workers.indexOf(false);
+      workers[workerNr] = true;
     }
 
     index += 1;
@@ -125,7 +125,7 @@ function scheduler(
         pendingImmediate -= 1;
       } else {
         pending -= 1;
-        workers[workerNr - 1] = false;
+        workers[workerNr] = false;
       }
     });
   }
