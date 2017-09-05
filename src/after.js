@@ -7,7 +7,7 @@ import type { Task } from './types';
  * @param promise The promise after which to run the task
  * @param task The task to run after the promise
  * @example
- * const taskWithCleanup = after(task(), cleanup);
+ * const taskWithCleanup = () => after(task(), cleanup);
  *
  * // same as
  * const taskWithCleanup = async () => {
@@ -18,7 +18,7 @@ import type { Task } from './types';
  *   }
  * }
  */
-function after<T>(promise: Promise<T>, task: Task<void, any>): Promise<T> {
+function after<T>(promise: Promise<T>, task: Task<void, void>): Promise<T> {
   const onFulfilledOrRejected = () => Promise.resolve(task()).then(() => promise);
   return promise.then(onFulfilledOrRejected, onFulfilledOrRejected);
 }

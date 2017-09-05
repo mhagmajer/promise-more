@@ -181,12 +181,12 @@ Runs task after promise was resolved or rejected (like `finally`).
 **Parameters**
 
 -   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise after which to run the task
--   `task` **[Task](#task)&lt;void, any>** The task to run after the promise
+-   `task` **[Task](#task)&lt;void, void>** The task to run after the promise
 
 **Examples**
 
 ```javascript
-const taskWithCleanup = after(task(), cleanup);
+const taskWithCleanup = () => after(task(), cleanup);
 
 // same as
 const taskWithCleanup = async () => {
