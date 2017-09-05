@@ -48,6 +48,7 @@ delay(500).then(() => { // wait half a second
 -   [scheduler](#scheduler)
 -   [sequence](#sequence)
 -   [UTILITIES](#utilities)
+-   [after](#after)
 -   [delay](#delay)
 -   [timeout](#timeout)
 -   [ERRORS](#errors)
@@ -91,16 +92,17 @@ Task execution options (all optional):
 -   `immediate` [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) Whether the task should be run immediately disregarding the queue
     (default `false`)
 -   `priority` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Priority (the higher the value, the sooner task is run) (default `0`)
--   `context` any data you want make available to the task at the time of execution
+-   `context` any data you want make available to the task at the time of execution (default
+    `undefined`)
 
-Tasks are passed a single object argument with the following properties:
+Tasks are passed as a single object argument with the following properties:
 
--   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of task in queue (`-1` for immediate tasks). If running tasks
-    in a process pool, you can use it to easily get the number of process:
-    `index % schedulerOptions.limit`.
-    Starts with `1`.
--   `pending` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks currently running. Always positive.
+-   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Order in which scheduled tasks are run. Starts with `1`.
+-   `pending` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks currently running (including immediate ones). Always
+    positive.
 -   `waiting` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks still in the queue
+-   `workerNr` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The number of worker (`1`..`limit`) who should get this task. For
+    immediate tasks it is `0` - they are usually run with some extra resources.
 -   `options` Task options with default values
 -   `schedulerOptions` Scheduler options with default values
 
@@ -171,6 +173,32 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 Other utility functions.
 
+
+## after
+
+Runs task after promise was resolved or rejected (like `finally`).
+
+**Parameters**
+
+-   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise after which to run the task
+-   `task` **[Task](#task)&lt;void, any>** The task to run after the promise
+
+**Examples**
+
+```javascript
+const taskWithCleanup = after(task(), cleanup);
+
+// same as
+const taskWithCleanup = async () => {
+  try {
+    return await task();
+  } finally {
+    await cleanup();
+  }
+}
+```
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
 
 ## delay
 

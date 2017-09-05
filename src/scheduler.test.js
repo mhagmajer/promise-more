@@ -42,9 +42,10 @@ test('it respects the limit of tasks', () => {
     if (running === limit) {
       throw new Error('Task run over the limit');
     }
+
     running += 1;
     return delay(10).then(() => {
-      running -= 10;
+      running -= 1;
     });
   };
 
@@ -91,30 +92,38 @@ test('it runs tasks with arguments', () => {
   expect.assertions(3);
 
   const schedule = scheduler();
+
   const task = jest.fn(() => delay(10));
   schedule(task);
   expect(task).toHaveBeenLastCalledWith({
     index: 1,
     pending: 1,
     waiting: 0,
+    workerNr: 1,
     options: {
       immediate: false,
       priority: 0,
+      context: undefined,
     },
     schedulerOptions: {
       limit: 1,
     },
   });
-  schedule(() => delay(10));
 
-  schedule(task, { immediate: true });
-  expect(task).toHaveBeenLastCalledWith({
-    index: -1,
-    pending: 1,
+  const waitingTask = jest.fn(() => delay(10));
+  schedule(waitingTask);
+
+  const immediateTask = jest.fn();
+  schedule(immediateTask, { immediate: true });
+  expect(immediateTask).toHaveBeenLastCalledWith({
+    index: 2,
+    pending: 2,
     waiting: 1,
+    workerNr: 0,
     options: {
       immediate: true,
       priority: 0,
+      context: undefined,
     },
     schedulerOptions: {
       limit: 1,
@@ -123,12 +132,14 @@ test('it runs tasks with arguments', () => {
 
   const context = {};
 
+  const importantTask = jest.fn(() => delay(10));
   return expect(
-    schedule(task, { priority: 1, context }).then(() => task)
+    schedule(importantTask, { priority: 1, context }).then(() => importantTask)
   ).resolves.toHaveBeenLastCalledWith({
-    index: 2,
+    index: 3,
     pending: 1,
     waiting: 1,
+    workerNr: 1,
     options: {
       immediate: false,
       priority: 1,
@@ -138,4 +149,16 @@ test('it runs tasks with arguments', () => {
       limit: 1,
     },
   });
+});
+
+test('it assign correct worker numbers', () => {
+  expect.assertions(1);
+
+  const schedule = scheduler({ limit: 2 });
+
+  const task = ms => options => delay(ms).then(() => options.workerNr);
+
+  return expect(Promise.all(
+    [10, 5, 5].map(ms => schedule(task(ms)))
+  )).resolves.toEqual([1, 2, 2]);
 });

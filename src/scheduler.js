@@ -3,6 +3,7 @@
 
 import type { Task } from './types';
 
+const after = require('./after');
 const invariant = require('./invariant');
 const PriorityQueue = require('./priority-queue');
 
@@ -20,6 +21,7 @@ export type RunParameters<C> = {
   index: number,
   pending: number,
   waiting: number,
+  workerNr: number,
   options: TaskOptions<C>,
   schedulerOptions: SchedulerOptions,
 };
@@ -41,15 +43,16 @@ type QueueElem<T, C> = {|
  * - `immediate` {@link boolean} Whether the task should be run immediately disregarding the queue
  * (default `false`)
  * - `priority` {@link number} Priority (the higher the value, the sooner task is run) (default `0`)
- * - `context` any data you want make available to the task at the time of execution
+ * - `context` any data you want make available to the task at the time of execution (default
+ * `undefined`)
  *
- * Tasks are passed a single object argument with the following properties:
- * - `index` {@link number} Number of task in queue (`-1` for immediate tasks). If running tasks
- * in a process pool, you can use it to easily get the number of process:
- * `index % schedulerOptions.limit`.
- * Starts with `1`.
- * - `pending` {@link number} Number of tasks currently running. Always positive.
+ * Tasks are passed as a single object argument with the following properties:
+ * - `index` {@link number} Order in which scheduled tasks are run. Starts with `1`.
+ * - `pending` {@link number} Number of tasks currently running (including immediate ones). Always
+ * positive.
  * - `waiting` {@link number} Number of tasks still in the queue
+ * - `workerNr` {@link number} The number of worker (`1`..`limit`) who should get this task. For
+ * immediate tasks it is `0` - they are usually run with some extra resources.
  * - `options` Task options with default values
  * - `schedulerOptions` Scheduler options with default values
  * @example
@@ -91,15 +94,40 @@ function scheduler(
 
   let index = 0;
   let pending = 0;
+  let pendingImmediate = 0;
+
+  const workers = Array(limit).fill(false);
 
   function runTask<T, C>(task: Task<T, RunParameters<C>>, options: TaskOptions<C>): Promise<T> {
-    return Promise.resolve(task({
-      index: options.immediate ? -1 : index,
-      pending,
+    const { immediate } = options;
+
+    let workerNr;
+
+    if (immediate) {
+      pendingImmediate += 1;
+      workerNr = 0;
+    } else {
+      pending += 1;
+      workerNr = workers.indexOf(false) + 1;
+      workers[workerNr - 1] = true;
+    }
+
+    index += 1;
+    return after(Promise.resolve(task({
+      index,
+      pending: pending + pendingImmediate,
       waiting: queue.size(),
+      workerNr,
       options,
       schedulerOptions: schedulerOptionsWithDefaults,
-    }));
+    })), () => {
+      if (immediate) {
+        pendingImmediate -= 1;
+      } else {
+        pending -= 1;
+        workers[workerNr - 1] = false;
+      }
+    });
   }
 
   function runNextTask() {
@@ -109,13 +137,7 @@ function scheduler(
 
     const next = queue.pop();
     invariant(next != null, 'queue is not empty');
-
-    index += 1;
-    pending += 1;
-    runTask(next.task, next.options).then(next.resolve, next.reject).then(() => {
-      pending -= 1;
-      runNextTask();
-    });
+    runTask(next.task, next.options).then(next.resolve, next.reject).then(runNextTask);
   }
 
   return function taskRunner<T, C>(

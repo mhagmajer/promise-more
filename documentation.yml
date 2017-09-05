@@ -6,6 +6,7 @@ toc:
   - sequence
   - name: UTILITIES
     description: Other utility functions.
+  - after
   - delay
   - timeout
   - name: ERRORS
