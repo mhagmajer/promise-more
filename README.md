@@ -50,6 +50,10 @@ delay(500).then(() => { // wait half a second
 -   [UTILITIES](#utilities)
 -   [after](#after)
 -   [delay](#delay)
+-   [delayedReject](#delayedreject)
+-   [delayedResolve](#delayedresolve)
+-   [state](#state)
+-   [PromiseState](#promisestate)
 -   [timeout](#timeout)
 -   [ERRORS](#errors)
 -   [TimeoutError](#timeouterror)
@@ -181,19 +185,21 @@ Runs task after promise was resolved or rejected (like `finally`).
 **Parameters**
 
 -   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise after which to run the task
--   `task` **[Task](#task)&lt;void, void>** The task to run after the promise. If the task throws, the error is propagated.
+-   `task` **[Task](#task)&lt;void, [PromiseState](#promisestate)&lt;T>>** The task to run after the promise. Called with result of [state](#state) of the promise
+    (`fulfilled` or `rejected`). If the task throws, the error is propagated to the promise returned
+    from `after`.
 
 **Examples**
 
 ```javascript
-const taskWithCleanup = () => after(task(), cleanup);
+const taskWithCleanup = () => after(operation(), cleanup);
 
 // same as
 const taskWithCleanup = async () => {
   try {
-    return await task();
+    return await operation();
   } finally {
-    await cleanup();
+    await cleanup(); // no way to know if the task succeded
   }
 }
 ```
@@ -219,6 +225,42 @@ async function main() {
 ```
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;void>** 
+
+## delayedReject
+
+Waits for given time and then rejects with given reason.
+
+**Parameters**
+
+-   `reason` **any** The reason to reject.
+-   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait.
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;any>** 
+
+## delayedResolve
+
+Waits for given time and then resolves with given value.
+
+**Parameters**
+
+-   `value` **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T> | T)** The value to resolve to.
+-   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait.
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
+
+## state
+
+State
+
+**Parameters**
+
+-   `promise` **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** The promise to determine the state of.
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[PromiseState](#promisestate)&lt;T>>** 
+
+## PromiseState
+
+Type: ({state: `"pending"`} | {state: `"fulfilled"`, value: T} | {state: `"rejected"`, reason: any})
 
 ## timeout
 

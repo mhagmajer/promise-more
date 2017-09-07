@@ -1,25 +1,33 @@
 /* @flow */
 
 const { TimeoutError } = require('./errors');
-const delay = require('./delay');
+const delayedReject = require('./delayed-reject');
+const delayedResolve = require('./delayed-resolve');
 const timeout = require('./timeout');
 
 test('it resolves before timeout', () => {
-  expect.assertions(1);
+  expect.assertions(3);
 
   const value = {};
-  return expect(timeout(
-    delay(5).then(() => value),
-    20
-  )).resolves.toBe(value);
+  return Promise.all([
+    expect(timeout(Promise.resolve(value), 0)).resolves.toBe(value),
+    expect(timeout(delayedResolve(value, 0), 0)).resolves.toBe(value),
+    expect(timeout(delayedResolve(value, 1), 1)).resolves.toBe(value),
+  ]);
 });
 
-test('it rejects after timeout', () => {
-  expect.assertions(1);
+test('it rejects before timeout', () => {
+  expect.assertions(3);
 
-  const value = {};
-  return expect(timeout(
-    delay(20).then(() => value),
-    5
-  )).rejects.toBeInstanceOf(TimeoutError);
+  const reason = {};
+  return Promise.all([
+    expect(timeout(Promise.reject(reason), 0)).rejects.toBe(reason),
+    expect(timeout(delayedReject(reason, 0), 0)).rejects.toBe(reason),
+    expect(timeout(delayedReject(reason, 1), 1)).rejects.toBe(reason),
+  ]);
+});
+
+test('it rejects with TimeoutError after timeout', () => {
+  expect.assertions(1);
+  return expect(timeout(delayedResolve(null, 2), 1)).rejects.toBeInstanceOf(TimeoutError);
 });

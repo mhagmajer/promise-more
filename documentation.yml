@@ -8,6 +8,10 @@ toc:
     description: Other utility functions.
   - after
   - delay
+  - delayedReject
+  - delayedResolve
+  - state
+  - PromiseState
   - timeout
   - name: ERRORS
     description: Possible errors.

@@ -1,7 +1,7 @@
 /* @flow */
 
 const { TimeoutError } = require('./errors');
-const delay = require('./delay');
+const delayedReject = require('./delayed-reject');
 
 /**
  * Rejects with instance of {@link TimeoutError} if promise doesn't resolve within the specified
@@ -13,12 +13,12 @@ const delay = require('./delay');
  * timeout(fetch('https://www.npmjs.com/'), 100);
  */
 function timeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    delay(ms).then(() => Promise.reject(new TimeoutError(
+  return new Promise((resolve, reject) => {
+    promise.then(resolve, reject);
+    delayedReject(new TimeoutError(
       `Timeout: Promise didn't resolve within the expected time of ${ms} milliseconds`
-    )))
-  ]);
+    ), ms).catch(reject);
+  });
 }
 
 module.exports = timeout;

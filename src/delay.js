@@ -1,5 +1,7 @@
 /* @flow */
 
+const delayedResolve = require('./delayed-resolve');
+
 /**
  * Waits for given time and then resolves with {@link undefined}.
  * @param ms The number of milliseconds to wait.
@@ -11,7 +13,7 @@
  * }
  */
 function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return delayedResolve(undefined, ms);
 }
 
 module.exports = delay;
