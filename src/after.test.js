@@ -12,7 +12,10 @@ test('it is run after fulfilled promise', () => {
   return Promise.all([
     promise.then(() => expect(cleanup).not.toHaveBeenCalled()),
     expect(after(promise, cleanup)).resolves.toBe(value),
-    promise.then(() => expect(cleanup).toHaveBeenCalled()),
+    promise.then(() => expect(cleanup).toHaveBeenCalledWith({
+      name: 'fulfilled',
+      value,
+    })),
   ]);
 });
 
@@ -25,7 +28,10 @@ test('it is run after rejected promise', () => {
   return Promise.all([
     promise.catch(() => expect(cleanup).not.toHaveBeenCalled()),
     expect(after(promise, cleanup)).rejects.toBe(reason),
-    promise.catch(() => expect(cleanup).toHaveBeenCalled()),
+    promise.catch(() => expect(cleanup).toHaveBeenCalledWith({
+      name: 'rejected',
+      reason,
+    })),
   ]);
 });
 

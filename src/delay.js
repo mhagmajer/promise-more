@@ -4,7 +4,7 @@ const delayedResolve = require('./delayed-resolve');
 
 /**
  * Waits for given time and then resolves with {@link undefined}.
- * @param ms The number of milliseconds to wait.
+ * @param ms The number of milliseconds to wait (default `0`)
  * @example
  * async function main() {
  *   // ...
@@ -12,7 +12,7 @@ const delayedResolve = require('./delayed-resolve');
  *   // ...
  * }
  */
-function delay(ms: number): Promise<void> {
+function delay(ms: number = 0): Promise<void> {
   return delayedResolve(undefined, ms);
 }
 

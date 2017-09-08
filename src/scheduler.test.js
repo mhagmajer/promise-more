@@ -97,9 +97,11 @@ test('it runs tasks with arguments', () => {
   schedule(task);
   expect(task).toHaveBeenLastCalledWith({
     index: 0,
+    workerNr: 0,
+    fulfilled: 0,
+    rejected: 0,
     pending: 1,
     waiting: 0,
-    workerNr: 0,
     options: {
       immediate: false,
       priority: 0,
@@ -117,9 +119,11 @@ test('it runs tasks with arguments', () => {
   schedule(immediateTask, { immediate: true });
   expect(immediateTask).toHaveBeenLastCalledWith({
     index: 1,
+    workerNr: -1,
+    fulfilled: 0,
+    rejected: 0,
     pending: 2,
     waiting: 1,
-    workerNr: -1,
     options: {
       immediate: true,
       priority: 0,
@@ -137,9 +141,11 @@ test('it runs tasks with arguments', () => {
     schedule(importantTask, { priority: 1, context }).then(() => importantTask)
   ).resolves.toHaveBeenLastCalledWith({
     index: 2,
+    workerNr: 0,
+    fulfilled: 2,
+    rejected: 0,
     pending: 1,
     waiting: 1,
-    workerNr: 0,
     options: {
       immediate: false,
       priority: 1,

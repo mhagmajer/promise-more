@@ -1,29 +1,34 @@
 /* @flow */
 
+const delayedResolve = require('./delayed-resolve');
+
 /**
  */
 export type PromiseState<T> = {|
-  state: 'pending',
+  name: 'pending',
 |} | {|
-  state: 'fulfilled',
+  name: 'fulfilled',
   value: T,
 |} | {|
-  state: 'rejected',
+  name: 'rejected',
   reason: any,
 |};
 
 /**
- * State
+ * Asynchronous API for checking state of the promise. The returned promise is fulfilled as soon as
+ * possible.
+ *
+ * Note: there is no public synchronous API for this.
  * @param promise The promise to determine the state of.
  * @example
  */
 function state<T>(promise: Promise<T>): Promise<PromiseState<T>> {
   return new Promise((resolve) => {
     promise.then(
-      value => resolve({ state: 'fulfilled', value }),
-      reason => resolve({ state: 'rejected', reason })
+      value => resolve({ name: 'fulfilled', value }),
+      reason => resolve({ name: 'rejected', reason })
     );
-    setTimeout(() => resolve({ state: 'pending' }));
+    delayedResolve({ name: 'pending' }).then(resolve);
   });
 }
 

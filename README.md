@@ -101,12 +101,13 @@ Task execution options (all optional):
 
 Tasks are passed as a single object argument with the following properties:
 
--   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The sequence number of the task being run. Starts with `0`.
+-   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The sequence number of the task being run (starts with `0`)
+-   `fulfilled` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of fulfilled tasks
+-   `rejected` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of rejected tasks
 -   `pending` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks currently running (including immediate ones). Always
     positive.
 -   `waiting` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks still in the queue
--   `workerNr` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The number of worker (`0`..`(limit-1)`) who should get this task. For
-    immediate tasks it is equal to `-1` - they are usually handled by some extra resources.
+    For immediate tasks it is equal to `-1` - they are assumed to be handled by some extra resources
 -   `options` Task options with default values
 -   `schedulerOptions` Scheduler options with default values
 
@@ -212,7 +213,7 @@ Waits for given time and then resolves with [undefined](https://developer.mozill
 
 **Parameters**
 
--   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait.
+-   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait (default `0`)
 
 **Examples**
 
@@ -232,8 +233,8 @@ Waits for given time and then rejects with given reason.
 
 **Parameters**
 
--   `reason` **any** The reason to reject.
--   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait.
+-   `reason` **any** The reason to reject
+-   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait (default `0`)
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;any>** 
 
@@ -243,14 +244,17 @@ Waits for given time and then resolves with given value.
 
 **Parameters**
 
--   `value` **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T> | T)** The value to resolve to.
--   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait.
+-   `value` **([Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T> | T)** The value to resolve to
+-   `ms` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The number of milliseconds to wait (default `0`)
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;T>** 
 
 ## state
 
-State
+Asynchronous API for checking state of the promise. The returned promise is fulfilled as soon as
+possible.
+
+Note: there is no public synchronous API for this.
 
 **Parameters**
 
@@ -260,7 +264,7 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ## PromiseState
 
-Type: ({state: `"pending"`} | {state: `"fulfilled"`, value: T} | {state: `"rejected"`, reason: any})
+Type: ({name: `"pending"`} | {name: `"fulfilled"`, value: T} | {name: `"rejected"`, reason: any})
 
 ## timeout
 

@@ -23,8 +23,8 @@ import type { PromiseState } from './state';
  */
 function after<T>(promise: Promise<T>, task: Task<void, PromiseState<T>>): Promise<T> {
   return promise.then(
-    value => task({ state: 'fulfilled', value }),
-    reason => task({ state: 'rejected', reason })
+    value => task({ name: 'fulfilled', value }),
+    reason => task({ name: 'rejected', reason })
   ).then(() => promise);
 }
 

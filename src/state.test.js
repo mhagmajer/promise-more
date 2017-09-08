@@ -8,7 +8,7 @@ test('it works for fulfilled promise', () => {
 
   const value = {};
   return expect(state(Promise.resolve(value))).resolves.toEqual({
-    state: 'fulfilled',
+    name: 'fulfilled',
     value,
   });
 });
@@ -18,7 +18,7 @@ test('it works for rejected promise', () => {
 
   const reason = {};
   return expect(state(Promise.reject(reason))).resolves.toEqual({
-    state: 'rejected',
+    name: 'rejected',
     reason,
   });
 });
@@ -26,7 +26,7 @@ test('it works for rejected promise', () => {
 test('it works for pending promise', () => {
   expect.assertions(1);
 
-  return expect(state(delay(1))).resolves.toEqual({
-    state: 'pending',
+  return expect(state(delay(10))).resolves.toEqual({
+    name: 'pending',
   });
 });

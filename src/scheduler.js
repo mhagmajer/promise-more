@@ -19,9 +19,11 @@ type TaskOptions<C> = {|
 
 export type RunParameters<C> = {
   index: number,
+  workerNr: number,
+  fulfilled: number,
+  rejected: number,
   pending: number,
   waiting: number,
-  workerNr: number,
   options: TaskOptions<C>,
   schedulerOptions: SchedulerOptions,
 };
@@ -47,12 +49,13 @@ type QueueElem<T, C> = {|
  * `undefined`)
  *
  * Tasks are passed as a single object argument with the following properties:
- * - `index` {@link number} The sequence number of the task being run. Starts with `0`.
+ * - `index` {@link number} The sequence number of the task being run (starts with `0`)
+ * - `fulfilled` {@link number} Number of fulfilled tasks
+ * - `rejected` {@link number} Number of rejected tasks
  * - `pending` {@link number} Number of tasks currently running (including immediate ones). Always
  * positive.
  * - `waiting` {@link number} Number of tasks still in the queue
- * - `workerNr` {@link number} The number of worker (`0`..`(limit-1)`) who should get this task. For
- * immediate tasks it is equal to `-1` - they are usually handled by some extra resources.
+ * For immediate tasks it is equal to `-1` - they are assumed to be handled by some extra resources
  * - `options` Task options with default values
  * - `schedulerOptions` Scheduler options with default values
  * @example
@@ -93,34 +96,44 @@ function scheduler(
   });
 
   let index = -1;
+  const workers = Array(limit).fill(false);
+
+  let fulfilled = 0;
+  let rejected = 0;
   let pending = 0;
   let pendingImmediate = 0;
-
-  const workers = Array(limit).fill(false);
 
   function runTask<T, C>(task: Task<T, RunParameters<C>>, options: TaskOptions<C>): Promise<T> {
     const { immediate } = options;
 
-    let workerNr;
+    index += 1;
 
+    let workerNr;
     if (immediate) {
-      pendingImmediate += 1;
       workerNr = -1;
+      pendingImmediate += 1;
     } else {
-      pending += 1;
       workerNr = workers.indexOf(false);
       workers[workerNr] = true;
+      pending += 1;
     }
 
-    index += 1;
     return after(Promise.resolve(task({
       index,
+      workerNr,
+      fulfilled,
+      rejected,
       pending: pending + pendingImmediate,
       waiting: queue.size(),
-      workerNr,
       options,
       schedulerOptions: schedulerOptionsWithDefaults,
-    })), () => {
+    })), (state) => {
+      if (state.name === 'fulfilled') {
+        fulfilled += 1;
+      } else if (state.name === 'rejected') {
+        rejected += 1;
+      }
+
       if (immediate) {
         pendingImmediate -= 1;
       } else {
