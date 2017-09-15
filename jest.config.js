@@ -1,7 +1,5 @@
 module.exports = {
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '<rootDir>/src/',
-  ],
-  verbose: true,
+  transform: {
+    '\\.js$': './jest-transformer.js',
+  },
 };
