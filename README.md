@@ -85,7 +85,7 @@ const task: Task<void, void> = async () => {
 
 ## scheduler
 
-Scheduler enqueues tasks to be run in accordance with options passed.
+Scheduler enqueues tasks to be run in accordance with the options passed.
 
 Scheduler options (all optional):
 
@@ -99,15 +99,16 @@ Task execution options (all optional):
 -   `context` any data you want make available to the task at the time of execution (default
     `undefined`)
 
-Tasks are passed as a single object argument with the following properties:
+Tasks are executed with a single object argument which contains the following properties:
 
 -   `index` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The sequence number of the task being run (starts with `0`)
+-   `workerNr` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) The number of worker (`0`..`(limit-1)`) who should get this task. For
+    immediate tasks it is equal to `-1` - they are usually handled by some extra resources.
 -   `fulfilled` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of fulfilled tasks
 -   `rejected` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of rejected tasks
 -   `pending` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks currently running (including immediate ones). Always
     positive.
 -   `waiting` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Number of tasks still in the queue
-    For immediate tasks it is equal to `-1` - they are assumed to be handled by some extra resources
 -   `options` Task options with default values
 -   `schedulerOptions` Scheduler options with default values
 
