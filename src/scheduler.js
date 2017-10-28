@@ -15,6 +15,7 @@ type TaskOptions<C> = {|
   immediate: boolean,
   priority: number,
   context: C,
+  taskIndex: number | void,
 |};
 
 export type RunParameters<C> = {
@@ -47,6 +48,9 @@ type QueueElem<T, C> = {|
  * - `priority` {@link number} Priority (the higher the value, the sooner task is run) (default `0`)
  * - `context` any data you want make available to the task at the time of execution (default
  * `undefined`)
+ * - `taskIndex` {@link number} run this task immediately with the same arguments as currently
+ * pending task with given index (default `undefined`). Tasks run this way are not included
+ * in statistics and other execution options are ignored.
  *
  * Tasks are executed with a single object argument which contains the following properties:
  * - `index` {@link number} The sequence number of the task being run (starts with `0`)
@@ -97,7 +101,7 @@ function scheduler(
   });
 
   let index = -1;
-  const workers = Array(limit).fill(false);
+  const workers: Array<RunParameters<any> | void> = Array(limit).fill(undefined);
 
   let fulfilled = 0;
   let rejected = 0;
@@ -105,30 +109,49 @@ function scheduler(
   let pendingImmediate = 0;
 
   function runTask<T, C>(task: Task<T, RunParameters<C>>, options: TaskOptions<C>): Promise<T> {
-    const { immediate } = options;
+    const { immediate, taskIndex } = options;
 
-    index += 1;
-
+    let runParams: RunParameters<C>;
     let workerNr;
-    if (immediate) {
-      workerNr = -1;
-      pendingImmediate += 1;
+    if (taskIndex !== undefined) {
+      const workerRunParams = workers.find(params => params && params.index === taskIndex);
+      invariant(workerRunParams, `no pending task with index ${taskIndex}`);
+      runParams = workerRunParams;
+
+      workerNr = runParams.workerNr;
     } else {
-      workerNr = workers.indexOf(false);
-      workers[workerNr] = true;
-      pending += 1;
+      index += 1;
+
+      if (immediate) {
+        workerNr = -1;
+        pendingImmediate += 1;
+      } else {
+        workerNr = workers.indexOf(undefined);
+        invariant(workerNr !== -1, 'Invalid worker number');
+        pending += 1;
+      }
+
+      runParams = {
+        index,
+        workerNr,
+        fulfilled,
+        rejected,
+        pending: pending + pendingImmediate,
+        waiting: queue.size(),
+        options,
+        schedulerOptions: schedulerOptionsWithDefaults,
+      };
+
+      if (!immediate) {
+        workers[workerNr] = runParams;
+      }
     }
 
-    return after(Promise.resolve(task({
-      index,
-      workerNr,
-      fulfilled,
-      rejected,
-      pending: pending + pendingImmediate,
-      waiting: queue.size(),
-      options,
-      schedulerOptions: schedulerOptionsWithDefaults,
-    })), (state) => {
+    return after(Promise.resolve(task(runParams)), (state) => {
+      if (taskIndex !== undefined) {
+        return;
+      }
+
       if (state.name === 'fulfilled') {
         fulfilled += 1;
       } else if (state.name === 'rejected') {
@@ -139,7 +162,7 @@ function scheduler(
         pendingImmediate -= 1;
       } else {
         pending -= 1;
-        workers[workerNr] = false;
+        workers[workerNr] = undefined;
       }
     });
   }
@@ -162,10 +185,11 @@ function scheduler(
       immediate = false,
       priority = 0,
       context,
+      taskIndex = undefined,
     } = options || {};
-    const optionsWithDefaults = { immediate, priority, context };
+    const optionsWithDefaults = { immediate, priority, context, taskIndex };
 
-    if (immediate) {
+    if (immediate || taskIndex !== undefined) {
       return runTask(task, optionsWithDefaults);
     }
 

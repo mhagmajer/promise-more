@@ -98,6 +98,9 @@ Task execution options (all optional):
 -   `priority` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) Priority (the higher the value, the sooner task is run) (default `0`)
 -   `context` any data you want make available to the task at the time of execution (default
     `undefined`)
+-   `taskIndex` [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) run this task immediately with the same arguments as currently
+    pending task with given index (default `undefined`). Tasks run this way are not included
+    in statistics and other execution options are ignored.
 
 Tasks are executed with a single object argument which contains the following properties:
 

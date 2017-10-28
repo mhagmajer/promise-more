@@ -157,7 +157,7 @@ test('it runs tasks with arguments', () => {
   });
 });
 
-test('it assign correct worker numbers', () => {
+test('it assigns correct worker numbers', () => {
   expect.assertions(1);
 
   const schedule = scheduler({ limit: 2 });
@@ -167,4 +167,37 @@ test('it assign correct worker numbers', () => {
   return expect(Promise.all(
     [10, 5, 5].map(ms => schedule(task(ms)))
   )).resolves.toEqual([0, 1, 1]);
+});
+
+test('it can continue execution', () => {
+  expect.assertions(1);
+
+  const schedule = scheduler();
+
+  const task = ms => options => delay(ms).then(() => ({
+    index: options.index,
+    fulfilled: options.fulfilled,
+  }));
+
+  return expect(Promise.all(
+    [{
+      ms: 10,
+      taskIndex: undefined,
+    }, {
+      ms: 5,
+      taskIndex: 0,
+    }, {
+      ms: 5,
+      taskIndex: undefined,
+    }].map(({ ms, taskIndex }) => schedule(task(ms), { taskIndex }))
+  )).resolves.toEqual([{
+    index: 0,
+    fulfilled: 0,
+  }, {
+    index: 0,
+    fulfilled: 0,
+  }, {
+    index: 1,
+    fulfilled: 1
+  }]);
 });
